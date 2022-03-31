@@ -14,7 +14,7 @@ router.get("/test-me", function (req, res) {
 
 
 // user API
-router.post("/user",userController.createUser)
+router.post("/register",userController.createUser)
 
 router.post("/login",userController.loginUser)
 
@@ -29,7 +29,7 @@ bookController.createBooks)
 
 router.get("/books",middleWear.authentication ,bookController.getBooks)
 
-router.get("/book/:bookId",middleWear.authentication ,bookController.getAllBooks)
+router.get("/books/:bookId",middleWear.authentication ,bookController.getAllBooks)
 
 router.put("/books/:bookId",middleWear.authentication ,
 middleWear.authorization,
