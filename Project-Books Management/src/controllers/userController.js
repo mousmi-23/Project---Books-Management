@@ -226,7 +226,7 @@ const loginUser = async function (req, res) {
 
 
         // const token = await jwt.sign({
-        //     userId:user._id,
+        //     userId:user[0]._id,
         //     iat: Math.floor(Date.now() / 1000),
         //     exp : Math.floor(Date.now() / 1000) + 10 * 60 * 60
         // },'Book-Management')
