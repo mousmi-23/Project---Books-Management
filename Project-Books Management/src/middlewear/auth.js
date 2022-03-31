@@ -18,7 +18,14 @@ const authentication = async function (req, res, next) {
         res.setHeader('x-api-key', token)
         next()
     } catch (err) {
-        res.status(500).send({ status: false, error: err.message })
+
+        if(err.message== "invalid token") return res.status(401).send({ status: false, msg: "authentication failed May be your hadder part currupt" }) // failed ka 401 ?
+        if(err.message.startsWith("Unexpected")) return res.status(401).send({ status: false, msg: "authentication failed May be your payload part currupt" }) // failed ka 401 ?
+        if(err.message== "invalid signature") return res.status(401).send({ status: false, msg: "authentication failed May be your singature part currupt" }) // failed ka 401 ?
+        if(err.message== "jwt expired") return res.status(401).send({ status: false, msg: "authentication failed May be your Token is Expired" }) // failed ka 401 ?
+        return res.status(500).send({ status: false, err: err.message })
+        // priority wise error catch if any space present in anywhere at token catch only hadder part
+        
     }
 }
 
@@ -27,21 +34,21 @@ const authentication = async function (req, res, next) {
 const authorization = async function (req, res, next) {
 
     try {
-        
+
         let token = req.headers["x-api-key"]
-        let verifiedToken = jwt.verify(token,"Er. Sonu Verma" )
+        let verifiedToken = jwt.verify(token, "Er. Sonu Verma")
 
         let userId = verifiedToken.userId
         let isPresentUser = await userModel.findById(userId)
 
         if (!isPresentUser) return res.status(401).send({ status: false, msg: "Unautorize access" }) // just search if not fount than no access
 
-       // if (userId != req.query.userId) return res.status(401).send({ status: false, msg: "unauthorize access " })  //  take id from user if not match than no access
+        // if (userId != req.query.userId) return res.status(401).send({ status: false, msg: "unauthorize access " })  //  take id from user if not match than no access
 
         next()
 
     } catch (err) {
-        res.status(500).send({ status : false , err: err.message })
+        return res.status(500).send({ status: false, err: err.message })
     }
 }
 
