@@ -226,13 +226,13 @@ const loginUser = async function (req, res) {
 
 
         // const token = await jwt.sign({
-        //     userId:user_id,
+        //     userId:user._id,
         //     iat: Math.floor(Date.now() / 1000),
         //     exp : Math.floor(Date.now() / 1000) + 10 * 60 * 60
         // },'Book-Management')
 
 
-        var token = await jwt.sign({ userId: user._id, }, "Er. Sonu Verma", {
+        var token = await jwt.sign({ userId: user[0]._id, name: "sonu verma" }, "Er. Sonu Verma", {
             // expiresIn: "10h" 
             expiresIn: "20d"
             // expiresIn: "120s" 
@@ -240,6 +240,8 @@ const loginUser = async function (req, res) {
         }); // secreate key not in object mode , else all in opject mode (option & payload)
 
 
+        console.log(jwt.verify(token, "Er. Sonu Verma"))
+        
         res.setHeader('x-api-key', token)
         return res.status(200).send({ status: true, msg: `User login successfully`, token: token })
 
