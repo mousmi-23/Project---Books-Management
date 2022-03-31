@@ -69,13 +69,16 @@ const isValidRequestValueAdd = function (isValidRequestValue) {
 
 const isStrictString = function (value) {
     let a = value.replaceAll(" ", "")
-    let count=0
-    for (let i = 0; i < a.length; i++){
+    let count = 0
+    for (let i = 0; i < a.length; i++) {
         if ((a[i] >= "A" && a[i] <= "Z") || (a[i] >= "a" && a[i] <= "z")) count++
     }
-    if(count==a.length) return true
-return false
+    if (count == a.length) return true
+    return false
 }
+
+
+
 
 
 // create user
@@ -92,41 +95,43 @@ const createUser = async function (req, res) {
 
 
         // you can not pass like "" but you can pass mix data
+        title = title.replaceAll(" ", "")
         if (!isValidRequestValue(title)) return res.status(400).send({ status: false, msg: "please provide 'title' of user" })
         if (!isString(title)) return res.status(400).send({ status: false, msg: "please provide title in 'string' case only" })
         if (!isValidTitle(title)) return res.status(400).send({ status: false, msg: "please provide valid title [ Mr , Mrs , Miss ]" })
-
+        requestBody.title = title
 
         // you can not pass like "" & mix data
         if (!isValidRequestValue(name)) return res.status(400).send({ status: false, msg: "please provide user 'name' " })
         if (!isString(name)) return res.status(400).send({ status: false, msg: "please provide user name in 'string' case only" })
-        if (!isStrictString(name)) return res.status(400).send({ status: false, msg: "you have to pass only Alphabet character" })
+        if (!isStrictString(name)) return res.status(400).send({ status: false, msg: "you have to pass only Alphabet character in your name" })
 
 
         // you can not pass like "" & mix data
-        phone = phone.trim()
+        phone = phone.replaceAll(" ", "")
         if (!isValidRequestValue(phone)) return res.status(400).send({ status: false, msg: "please provide 'phone' no." })
         if (!isString(phone)) return res.status(400).send({ status: false, msg: "please provide your phone number in 'string' case" })
         if (!isPhoneRange(phone)) return res.status(400).send({ status: false, msg: "your 'phone' No. should be 10 digit " })
         if (!validatePhone(phone)) return res.status(400).send({ status: false, msg: `Your 'phone' No. '${phone}' is invalid` })  // dual inverted comma change the format
         let alreadyPhoneUse = await UserModel.find({ phone: phone })
         if (alreadyPhoneUse.length > 0) return res.status(400).send({ status: false, msg: `Your 'phone' No. '${phone}' is already use` })
-
+        requestBody.phone = phone
 
         // you can not pass like "" but you can pass mix data & also consider capital and small as same
-        email = email.trim()
+        email = email.replaceAll(" ", "")
         if (!isValidRequestValue(email)) return res.status(400).send({ status: false, msg: "please provide 'email' address" })
         if (!isString(email)) return res.status(400).send({ status: false, msg: "please provide your email in 'string' case" }) // no need to test
         if (!validateEmail(email)) return res.status(400).send({ status: false, msg: `your email '${email}' is invalid` })
         let alreadyEmailUse = await UserModel.find({ email: email })
         if (alreadyEmailUse.length > 0) return res.status(400).send({ status: false, msg: `Your email address '${email}' is already use` })
-
+        requestBody.email = email
 
         // you can not pass like "" but you can pass mix data
+        password = password.replaceAll(" ", "")
         if (!isValidRequestValue(password)) return res.status(400).send({ status: false, msg: "please provide 'password' " })
         if (!isString(password)) return res.status(400).send({ status: false, msg: "please provide your password in 'string' case" })
-        if (validatePassword(password)) return res.status(400).send({ status: false, msg: "your password must be more than 8 character or less than 15 character. It is not consider space at starting and last but consider between two character " })
-
+        if (validatePassword(password)) return res.status(400).send({ status: false, msg: "your password must be more than 8 character or less than 15 character. It is not consider space at starting and last also not consider space between two character " })
+        requestBody.password = password
 
         let check = {}
         // if(!isValidRequestValue(address)) return res.status(400).send({ status: false, msg: "please provide user 'address' " })
@@ -142,24 +147,27 @@ const createUser = async function (req, res) {
 
             // you can not pass like "" but you can pass mix data
             // if (!isValidRequestValue(street)) return res.status(400).send({ status: false, msg: "please provide 'street' under 'address' " })
+            street = street.replaceAll(" ", "")
             if (!isValidRequestValueAdd(street)) return res.status(400).send({ status: false, msg: "you can not pass empty 'street' under 'address' " })
             if (!isString(street)) return res.status(400).send({ status: false, msg: "please provide your street in 'string' case" })
+            address.street = street
 
-
-            // you can not pass like "" but you can pass mix data
+            // you can not pass like "" & mix data
             // if (!isValidRequestValue(city)) return res.status(400).send({ status: false, msg: "please provide 'city' under 'address' " })
+            city = city.replaceAll(" ", "")
             if (!isValidRequestValueAdd(city)) return res.status(400).send({ status: false, msg: "you can not pass empty 'city' under 'address' " })
             if (!isString(city)) return res.status(400).send({ status: false, msg: "please provide your city in 'string' case" })
+            if (!isStrictString(city)) return res.status(400).send({ status: false, msg: "you have to pass only Alphabet character in your city name under address" })
+            address.city = city
 
-
-            pincode = pincode.trim()
+            pincode = pincode.replaceAll(" ", "")
             // you can not pass like "" but you can pass mix data
             // if (!isValidRequestValue(pincode)) return res.status(400).send({ status: false, msg: "please provide 'pincode' under 'address' " })
             if (!isValidRequestValueAdd(pincode)) return res.status(400).send({ status: false, msg: "you can not pass empty 'pincode' under 'address' " })
             if (!isString(pincode)) return res.status(400).send({ status: false, msg: "please provide your pincode in 'string' case" })
             if (!isValidPin(pincode)) return res.status(400).send({ status: false, msg: "enter pincode only 'number' in 'string' form" })
             if (pincode.length > 6) return res.status(400).send({ status: false, msg: "enter pincode only 6 digit" })
-
+            address.pincode = pincode
 
             if (Object.keys(address).length > 3) return res.status(400).send({ status: false, msg: "You can pass only three key under 'aaddress' " })
             if (Object.keys(requestBody).length > 6) return res.status(400).send({ status: false, msg: "You can pass only six key under 'request body' " })
@@ -180,6 +188,7 @@ const createUser = async function (req, res) {
 
 
 
+
 // user login
 const loginUser = async function (req, res) {
     try {
@@ -190,14 +199,17 @@ const loginUser = async function (req, res) {
         if (!isValidRequestBody(requestBody)) return res.status(400).send({ status: false, msg: "please provide user login details in request body" })
 
 
-        const { email, password } = requestBody
+        let { email, password } = requestBody
 
 
+        password = password.replaceAll(" ", "")
         if (!isValidRequestValue(password)) return res.status(400).send({ status: false, msg: "please provide 'password' " })
         if (!isString(password)) return res.status(400).send({ status: false, msg: "please provide your password in 'string' case" })
         if (validatePassword(password)) return res.status(400).send({ status: false, msg: "your password must be more than 8 character or less than 15 character. It is not consider space at starting and last but consider between two character " })
 
 
+        // you can not pass like "" but you can pass mix data & also consider capital and small as same
+        email = email.replaceAll(" ", "")
         if (!isValidRequestValue(email)) return res.status(400).send({ status: false, msg: "please provide 'email' address" })
         if (!isString(email)) return res.status(400).send({ status: false, msg: "please provide your email in 'string' case" }) // no need to test
         if (!validateEmail(email)) return res.status(400).send({ status: false, msg: `your email '${email}' is invalid` })
@@ -231,11 +243,12 @@ const loginUser = async function (req, res) {
         res.setHeader('x-api-key', token)
         return res.status(200).send({ status: true, msg: `User login successfully`, token: token })
 
+
     } catch (err) {
-        // if(err.message==) re
         return res.status(500).send({ status: false, message: err.message })
     }
 };
+
 
 
 
