@@ -41,7 +41,7 @@ const createReview = async function (req, res) {
     try {
 
 
-     
+
 
 
         let paramsBookId = req.params.bookId // make sure you pass object id in path var. without any quote else not consider
@@ -91,7 +91,7 @@ const createReview = async function (req, res) {
 
 
             // if (!isValid(review)) return res.status(400).send({ status: false, message: "review is required" })
-            if (review.trim().length==0) { // not accept only quote but store in schema have to handle comming soon
+            if (review.trim().length == 0) { // not accept only quote but store in schema have to handle comming soon
                 if (!isValid(review)) return res.status(400).send({ status: false, msg: "please provide proper 'review' key " })
                 if (!isString(review)) return res.status(400).send({ status: false, msg: "please provide review in 'string' case only" })
             }
@@ -152,10 +152,20 @@ const updatedReview = async function (req, res) {
         const newReview = data.review
         const newRating = data.rating
         const newReviewedBy = data.reviewedBy
+        
+
+        if (Object.keys(data).length > 3) return res.status(400).send({ status: false, msg: "You can pass only 3 key under 'request body' " })
 
 
+        let filterData = ['review', 'rating', 'reviewedBy']
+        for (let i = 0; i < 3; i++) {
+            if (!(filterData.includes(Object.keys(data)[i])))
+                return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request body` })
+        }
+
+        
         // work only string
-        if (newReview.trim().length==0) { // not accept only quote but store in schema have to handle comming soon
+        if (newReview.trim().length == 0) { // not accept only quote but store in schema have to handle comming soon
             if (!isValid(newReview)) return res.status(400).send({ status: false, msg: "please provide proper 'review' key " })
             if (!isString(newReview)) return res.status(400).send({ status: false, msg: "please provide review in 'string' case only" }) // no need
         }
@@ -168,7 +178,7 @@ const updatedReview = async function (req, res) {
         }
 
 
-        if (newReviewedBy.trim().length==0) { // not accept only quote but store in schema have to handle comming soon
+        if (newReviewedBy.trim().length == 0) { // not accept only quote but store in schema have to handle comming soon
             if (!isValid(newReviewedBy)) return res.status(400).send({ status: false, msg: "please provide proper 'reviewedBy' key " })
             if (!isString(newReviewedBy)) return res.status(400).send({ status: false, msg: "please provide reviewedBy in 'string' case only" }) // no need
         }
@@ -191,23 +201,26 @@ const updatedReview = async function (req, res) {
 
 
 
+
+
 const deletedReview = async function (req, res) {
     try {
 
         if (isValidRequestBody(req.query)) return res.status(400).send({ status: false, msg: "You can not pass query" })
-//        if (isValidRequestBody(req.body)) return res.status(400).send({ status: false, msg: "You can not pass request body" })
+        // if (isValidRequestBody(req.body)) return res.status(400).send({ status: false, msg: "You can not pass request body" })
 
         if (isValidRequestBody(req.body)) return res.status(400).send({ status: false, msg: "You can not pass body" })
         const bookId = req.params.bookId
         const reviewId = req.params.reviewId
-
+        if (!isObjectId(bookId)) return res.status(400).send({ status: false, msg: "your path params book id must be a object Id" })  // not consider last char if char than put char
+        if (!isObjectId(reviewId)) return res.status(400).send({ status: false, msg: "your path params review id must be a object Id" })  // not consider last char if char than put char
 
         const findBook = await bookModel.findById(bookId)
         if (!findBook) return res.status(400).send({ status: false, message: "book id is not present" })
 
 
         if (findBook.isDeleted === false) {
-            
+
             const findReview = await reviewModel.findById(reviewId)
 
 
@@ -217,9 +230,18 @@ const deletedReview = async function (req, res) {
             if (findReview.isDeleted === false) {
 
                 const deleteReview = await reviewModel.findOneAndUpdate({ _id: reviewId }, { isDeleted: true }, { new: true })  // deleteAt: Date.now() not in schema
+
+
+                if (deleteReview) {
+                    let reviews = findBook.reviews
+                    reviews = reviews - 1
+                    await bookModel.findOneAndUpdate({ _id: bookId }, { reviews: reviews }, { new: true })
+                }
+
+
                 return res.status(202).send({ status: true, message: "Data Deleted Successfully", data: deleteReview })
-            } 
-            
+            }
+
             else return res.status(400).send({ status: false, message: "reviewData is already Deleted" })
 
         }
