@@ -116,6 +116,7 @@ const createBooks = async function (req, res) {
         if (reviews) {  // not accept accept only quote
             if (!isValidRequestValueNotRequired(reviews)) return res.status(400).send({ status: false, msg: "please provide proper reviews" })
             if (!isNumber(reviews)) return res.status(400).send({ status: false, msg: "please provide reviews in 'Number' case only" })
+            if (reviews < 0) return res.status(400).send({ status: false, msg: "please provide reviews in more than 0 or 0 case only" })
         }
 
 
@@ -307,6 +308,33 @@ const updateBooks = async function (req, res) {
         let newISBN = req.query.ISBN
 
 
+        // have to pass title without quote and space
+        if (newTitle) {
+            let data = await bookModel.find()
+            for (let i = 0; i < data.length; i++) {
+                if (newTitle == data[i].title)
+                    return res.status(400).send({ status: false, msg: "You title is already present. it should be unike" })
+            }
+        }
+
+
+        // have to pass title without quote and space
+        if (newISBN) {
+            let data = await bookModel.find()
+            for (let i = 0; i < data.length; i++) {
+                if (newISBN == data[i].ISBN)
+                    return res.status(400).send({ status: false, msg: "You ISBN is already present. it should be unike" })
+            }
+        }
+
+
+        let filterData = ['title', 'excerpt', 'releasedAt']
+        for (let i = 0; i < 3; i++) {
+            if (!(filterData.includes(Object.keys(input)[i])))
+                return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request query` })
+        }
+
+
         if (!validateDateFormat(newReleaseAt)) return res.status(400).send({ status: false, msg: "Regx please provide 'releasedAt' Date in 'YYYY-MM-DD' format " })
 
 
@@ -372,3 +400,4 @@ module.exports.getBooks = getBooks
 module.exports.getAllBooks = getAllBooks
 module.exports.updateBooks = updateBooks
 module.exports.deleteBook = deleteBook
+
