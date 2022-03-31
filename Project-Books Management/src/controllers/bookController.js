@@ -328,10 +328,12 @@ const updateBooks = async function (req, res) {
         }
 
 
-        let filterData = ['title', 'excerpt', 'releasedAt']
+        let filterData = ['title', 'excerpt', 'releasedAt','ISBN']
+        
         for (let i = 0; i < 3; i++) {
-            if (!(filterData.includes(Object.keys(input)[i])))
+            if (!filterData.includes(Object.keys(input)[i])) {
                 return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request query` })
+            }
         }
 
 
