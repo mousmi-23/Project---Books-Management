@@ -30,19 +30,13 @@ const isNumber = function (isNumber) {
 }
 
 
-
 const isBoolean = function (isBoolean) {
     if (typeof isBoolean !== 'boolean') return false
     return true
 }
 
-
 const createReview = async function (req, res) {
     try {
-
-
-
-
 
         let paramsBookId = req.params.bookId // make sure you pass object id in path var. without any quote else not consider
         if (!isObjectId(paramsBookId)) return res.status(400).send({ status: false, msg: "your path params book id must be a object Id" })
@@ -201,8 +195,6 @@ const updatedReview = async function (req, res) {
 
 
 
-
-
 const deletedReview = async function (req, res) {
     try {
 
@@ -223,9 +215,7 @@ const deletedReview = async function (req, res) {
 
             const findReview = await reviewModel.findById(reviewId)
 
-
             if (!findReview) return res.status(400).send({ status: false, message: " ReviewId is not present" })
-
 
             if (findReview.isDeleted === false) {
 
@@ -238,7 +228,6 @@ const deletedReview = async function (req, res) {
                     await bookModel.findOneAndUpdate({ _id: bookId }, { reviews: reviews }, { new: true })
                 }
 
-
                 return res.status(202).send({ status: true, message: "Data Deleted Successfully", data: deleteReview })
             }
 
@@ -246,9 +235,7 @@ const deletedReview = async function (req, res) {
 
         }
 
-
-        else return res.status(400).send({ status: false, message: "BookData is already Deleted" })
-
+          else return res.status(400).send({ status: false, message: "BookData is already Deleted" })
 
     } catch (err) {
         return res.status(500).send({ error: err.message })

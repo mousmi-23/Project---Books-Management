@@ -62,9 +62,6 @@ function validateDateFormat(date) {
 }
 
 
-
-
-
 const createBooks = async function (req, res) {
     try {
         if (isValidRequestBody(req.query)) return res.status(400).send({ status: false, msg: "You can not pass query" })
@@ -237,7 +234,7 @@ const getAllBooks = async function (req, res) { // have to pass id without any s
         bookId = req.params.bookId
         if (!isObjectId(bookId)) return res.status(400).send({ status: false, msg: "your book id must be a object Id" })
         let bookData = await bookModel.findById({ _id: bookId })
-        if (!bookData) return res.status(400).send({ status: true, msg: "book is not present" })
+        if (!bookData) return res.status(404).send({ status: true, msg: "book is not present" })
 
 
         let bookDataWithReview = await reviewModel.find({ bookId: bookId }).select({ bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })//.populate('bookId')
@@ -317,7 +314,7 @@ const updateBooks = async function (req, res) {
             }
         }
 
-
+//releaseAt hume Date.now se hogya
         // have to pass title without quote and space
         if (newISBN) {
             let data = await bookModel.find()

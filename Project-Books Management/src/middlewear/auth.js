@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const userModel = require("../models/userModel")
 
 
-
 const authentication = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"]
@@ -43,7 +42,7 @@ const authorization = async function (req, res, next) {
 
         if (!isPresentUser) return res.status(401).send({ status: false, msg: "Unautorize access" }) // just search if not fount than no access
 
-        // if (userId != req.query.userId) return res.status(401).send({ status: false, msg: "unauthorize access " })  //  take id from user if not match than no access
+        //if (userId != req.query.userId) return res.status(401).send({ status: false, msg: "unauthorize access " })  //  take id from user if not match than no access
 
         next()
 

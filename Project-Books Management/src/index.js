@@ -1,5 +1,5 @@
 
-
+//decode token nh leta hai
 //  *********      SONU VERMA         **********           SONU VERMA          ***********             //
 
 
@@ -23,8 +23,8 @@ mongoose.connect("mongodb+srv://sonu517825:m0ww1dng9uqrz0ge@cluster0.wgtiy.mongo
 app.use('/', route);
 
 
-app.listen(process.env.PORT || 3000, function () {
-    console.log('Express app running on port ' + (process.env.PORT || 3000))
+app.listen(process.env.PORT || 3001, function () {
+    console.log('Express app running on port ' + (process.env.PORT || 3001))
 });
 
 
