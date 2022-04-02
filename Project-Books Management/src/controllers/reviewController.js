@@ -38,10 +38,14 @@ const isBoolean = function (isBoolean) {
 const createReview = async function (req, res) {
     try {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f9b4a3e0c3db7c4e7aeb86847a360e6b0f740e8d
         let paramsBookId = req.params.bookId // make sure you pass object id in path var. without any quote else not consider
         if (!isObjectId(paramsBookId)) return res.status(400).send({ status: false, msg: "your path params book id must be a object Id" })
         let isBookPresent = await bookModel.findOne({ _id: paramsBookId, isDeleted: false })
-        if (!isBookPresent) return res.status(400).send({ status: true, msg: "book is not present may be book is deleted" })
+        if (!isBookPresent) return res.status(404).send({ status: true, msg: "book is not present may be book is deleted" })
         // we can also handle indivisual    comming soon
 
 
@@ -60,7 +64,7 @@ const createReview = async function (req, res) {
         let book_id = bookId.replaceAll(" ", "")
         if (!isValid(book_id)) return res.status(400).send({ status: false, message: "bookId is required" })
         if (!isObjectId(book_id)) return res.status(400).send({ status: false, msg: "your request body book id must be a object Id" })
-        data.bookId = book_id // no need 
+        //data.bookId = book_id // no need 
 
 
         if (paramsBookId !== book_id) return res.status(400).send({ status: false, msg: "make sure path variable book Id must be same your request body book Id" })
@@ -98,17 +102,18 @@ const createReview = async function (req, res) {
             }
 
 
-            const saveData = await reviewModel.create(data)
+            let saveData = await reviewModel.create(data)
+            saveData = await reviewModel.find({ _id: saveData._id }).select({ bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })//.populate('bookId')
 
 
             if (saveData) {
                 let reviews = isBookPresent.reviews
                 reviews = reviews + 1
-                await bookModel.findOneAndUpdate({ _id: _id }, { reviews: reviews }, { new: true })
+                let bookData = await bookModel.findOneAndUpdate({ _id: _id }, { reviews: reviews }, { new: true })
+                let Result = bookData.toObject()
+                Result.reviewData = saveData
+                return res.status(201).send({ status: true, message: "Data Created Successfully", reviewCount: reviews, data: Result })
             }
-
-
-            return res.status(201).send({ status: true, message: "Data Created Successfully", data: saveData })
             // here we not populate with book data we can see only review model populate comming soon
 
         }
@@ -146,18 +151,18 @@ const updatedReview = async function (req, res) {
         const newReview = data.review
         const newRating = data.rating
         const newReviewedBy = data.reviewedBy
-        
+
 
         if (Object.keys(data).length > 3) return res.status(400).send({ status: false, msg: "You can pass only 3 key under 'request body' " })
 
 
         let filterData = ['review', 'rating', 'reviewedBy']
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < Object.keys(data).length; i++) {
             if (!(filterData.includes(Object.keys(data)[i])))
                 return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request body` })
         }
 
-        
+
         // work only string
         if (newReview.trim().length == 0) { // not accept only quote but store in schema have to handle comming soon
             if (!isValid(newReview)) return res.status(400).send({ status: false, msg: "please provide proper 'review' key " })
@@ -178,7 +183,7 @@ const updatedReview = async function (req, res) {
         }
 
 
-        const updateReview = await reviewModel.findOneAndUpdate({ _id: paramsReviewId },
+        let updateReview = await reviewModel.findOneAndUpdate({ _id: paramsReviewId },
             {
                 $set: {
                     review: newReview,
@@ -186,8 +191,10 @@ const updatedReview = async function (req, res) {
                     reviewedBy: newReviewedBy
                 }
             }, { new: true })
-
-        return res.status(200).send({ status: true, message: "Data Updated Successfully", data: updateReview })
+        updateReview = await reviewModel.find({ _id: paramsReviewId })
+        let Result = isBookPresent.toObject()
+        Result.reviewData = updateReview
+        return res.status(200).send({ status: true, message: "Data Updated Successfully", data: Result })
     } catch (err) {
         return res.status(500).send({ status: false, error: err.message })
     }
@@ -226,9 +233,13 @@ const deletedReview = async function (req, res) {
                     let reviews = findBook.reviews
                     reviews = reviews - 1
                     await bookModel.findOneAndUpdate({ _id: bookId }, { reviews: reviews }, { new: true })
+                    return res.status(202).send({ status: true, message: "Data Deleted Successfully", reviewCount: reviews, data: deleteReview })
                 }
+<<<<<<< HEAD
 
                 return res.status(202).send({ status: true, message: "Data Deleted Successfully", data: deleteReview })
+=======
+>>>>>>> f9b4a3e0c3db7c4e7aeb86847a360e6b0f740e8d
             }
 
             else return res.status(400).send({ status: false, message: "reviewData is already Deleted" })

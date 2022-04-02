@@ -325,14 +325,20 @@ const updateBooks = async function (req, res) {
         }
 
 
-        let filterData = ['title', 'excerpt', 'releasedAt']
-        for (let i = 0; i < 3; i++) {
-            if (!(filterData.includes(Object.keys(input)[i])))
-                return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request query` })
+        let filterData = ['title', 'excerpt', 'releasedAt', 'ISBN']
+
+
+        // this is DSA apporch   we can reduce this
+        let count = 0
+        for (let i = 0; i < Object.keys(input).length; i++) {
+            if (filterData.includes(Object.keys(input)[i])) {
+                if(Object.keys(input)[i]=='releasedAt'){
+                    if (!validateDateFormat(Object.values(input)[i])) return res.status(400).send({ status: false, msg: "Regx please provide 'releasedAt' Date in 'YYYY-MM-DD' format " })
+                }
+             }
+            else count++
         }
-
-
-        if (!validateDateFormat(newReleaseAt)) return res.status(400).send({ status: false, msg: "Regx please provide 'releasedAt' Date in 'YYYY-MM-DD' format " })
+        if (count != 0) return res.status(400).send({ status: false, msg: `You can pass only '${filterData}' as a update in request query` })
 
 
         let updateBooks = await bookModel.findByIdAndUpdate(
