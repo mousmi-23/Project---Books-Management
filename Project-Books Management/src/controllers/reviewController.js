@@ -111,7 +111,7 @@ const createReview = async function (req, res) {
                 let bookData = await bookModel.findOneAndUpdate({ _id: _id }, { reviews: reviews }, { new: true })
                 let Result = bookData.toObject()
                 Result.reviewData = saveData
-                return res.status(201).send({ status: true, message: "Data Created Successfully", reviewCount: reviews, data: Result })
+                return res.status(201).send({ status: true, message: "Review Data Created Successfully in Book Document", reviewCount: reviews, data: Result })
             }
             // here we not populate with book data we can see only review model populate comming soon
 
@@ -190,10 +190,13 @@ const updatedReview = async function (req, res) {
                     reviewedBy: newReviewedBy
                 }
             }, { new: true })
+
         updateReview = await reviewModel.find({ _id: paramsReviewId })
         let Result = isBookPresent.toObject()
         Result.reviewData = updateReview
-        return res.status(200).send({ status: true, message: "Data Updated Successfully", data: Result })
+
+        return res.status(200).send({ status: true, message: "Review Data Updated Successfully in Book document", data: Result })
+
     } catch (err) {
         return res.status(500).send({ status: false, error: err.message })
     }
@@ -239,17 +242,17 @@ const deletedReview = async function (req, res) {
                     //console.log(bookData, bookData.name = "Mousmi")
                     let result = bookData.toObject()
                     //console.log(result, result.name = "Mousmi")
-                    result.reviewData = findReview 
-                    return res.status(202).send({ status: true, message: "Data Deleted Successfully", reviewCount: reviews, data: result })
+                    result.reviewData = findReview
+                    return res.status(202).send({ status: true, message: "Review Data Deleted Successfully in Book Document", reviewCount: reviews, data: result })
                 }
             }
 
-            else return res.status(400).send({ status: false, message: "reviewData is already Deleted" })
+            else return res.status(400).send({ status: false, message: "Review Data is already Deleted" })
 
         }
 
 
-        else return res.status(400).send({ status: false, message: "BookData is already Deleted" })
+        else return res.status(400).send({ status: false, message: "Book Data is already Deleted" })
 
 
     } catch (err) {
