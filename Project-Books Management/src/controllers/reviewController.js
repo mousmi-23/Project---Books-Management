@@ -30,18 +30,17 @@ const isNumber = function (isNumber) {
 }
 
 
+
 const isBoolean = function (isBoolean) {
     if (typeof isBoolean !== 'boolean') return false
     return true
 }
 
+
 const createReview = async function (req, res) {
     try {
 
-<<<<<<< HEAD
-=======
 
->>>>>>> f9b4a3e0c3db7c4e7aeb86847a360e6b0f740e8d
         let paramsBookId = req.params.bookId // make sure you pass object id in path var. without any quote else not consider
         if (!isObjectId(paramsBookId)) return res.status(400).send({ status: false, msg: "your path params book id must be a object Id" })
         let isBookPresent = await bookModel.findOne({ _id: paramsBookId, isDeleted: false })
@@ -202,6 +201,8 @@ const updatedReview = async function (req, res) {
 
 
 
+
+
 const deletedReview = async function (req, res) {
     try {
 
@@ -222,7 +223,9 @@ const deletedReview = async function (req, res) {
 
             const findReview = await reviewModel.findById(reviewId)
 
+
             if (!findReview) return res.status(400).send({ status: false, message: " ReviewId is not present" })
+
 
             if (findReview.isDeleted === false) {
 
@@ -232,21 +235,22 @@ const deletedReview = async function (req, res) {
                 if (deleteReview) {
                     let reviews = findBook.reviews
                     reviews = reviews - 1
-                    await bookModel.findOneAndUpdate({ _id: bookId }, { reviews: reviews }, { new: true })
-                    return res.status(202).send({ status: true, message: "Data Deleted Successfully", reviewCount: reviews, data: deleteReview })
+                    let bookData = await bookModel.findOneAndUpdate({ _id: bookId }, { reviews: reviews }, { new: true })
+                    //console.log(bookData, bookData.name = "Mousmi")
+                    let result = bookData.toObject()
+                    //console.log(result, result.name = "Mousmi")
+                    result.reviewData = findReview 
+                    return res.status(202).send({ status: true, message: "Data Deleted Successfully", reviewCount: reviews, data: result })
                 }
-<<<<<<< HEAD
-
-                return res.status(202).send({ status: true, message: "Data Deleted Successfully", data: deleteReview })
-=======
->>>>>>> f9b4a3e0c3db7c4e7aeb86847a360e6b0f740e8d
             }
 
             else return res.status(400).send({ status: false, message: "reviewData is already Deleted" })
 
         }
 
-          else return res.status(400).send({ status: false, message: "BookData is already Deleted" })
+
+        else return res.status(400).send({ status: false, message: "BookData is already Deleted" })
+
 
     } catch (err) {
         return res.status(500).send({ error: err.message })
@@ -257,4 +261,3 @@ const deletedReview = async function (req, res) {
 module.exports.createReview = createReview
 module.exports.updatedReview = updatedReview
 module.exports.deletedReview = deletedReview
-

@@ -44,13 +44,14 @@ const isBoolean = function (isBoolean) {
     return true
 }
 
-
-function validateDateFormat(date) {
-    const validatePattern = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+//c{1}=A//asciicode//.lowercase
+//2==0002
+function validateDateFormat(date) {//1,2,3 ; 01,02,03
+    const validatePattern = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;//d=digit, 4=number//YYYY-MM-DD//(\/|-)=matching syntax//1=single digit,2=two digit//,/^ $/=,/
     let dateValues = date.match(validatePattern);  // return array format with input , group , date etc.
     if (dateValues == null) return false;
 
-    let dtYear = dateValues[1]; // array index get value
+    let dtYear = dateValues[1]; // array index get value//
     let dtMonth = dateValues[3];
     let dtDay = dateValues[5];
 
@@ -60,6 +61,9 @@ function validateDateFormat(date) {
 
     // here we check leap year also
 }
+
+
+
 
 
 const createBooks = async function (req, res) {
@@ -85,8 +89,8 @@ const createBooks = async function (req, res) {
         if (!isValidRequestValue(excerpt)) return res.status(400).send({ status: false, msg: "please provide 'excerpt' of user" })
         if (!isString(excerpt)) return res.status(400).send({ status: false, msg: "please provide excerpt in 'string' case only" })
 
-
-        let user_id = userId.replaceAll(" ", "")
+        //"    M  ou  sm   i   " : "Mousmi"; "Mousmi.replaceAll("m","M")"= result : MoUsMi //(space ko filter kar rha hai), //using regex
+        let user_id = userId.replaceAll(" ", "")//userid is in string, replace all covers , two argument passes, first argument : filter(for remove someone), sec arg :uske jagh pe new data 
         if (!isValidRequestValue(user_id)) return res.status(400).send({ status: false, msg: "please provide 'userId' of user" })
         if (!isObjectId(user_id)) return res.status(400).send({ status: false, msg: "your user id must be a object Id" })
         let isUserPresent = await userModel.findById({ _id: user_id })
@@ -153,7 +157,7 @@ const getBooks = async function (req, res) {    // you have to pass proper value
         let input = req.query
 
 
-        let filters = Object.entries(input)
+        let filters = Object.entries(input)//array bana rhe hi
         if (Object.keys(input).length != 0) {
             let emptyInput = filters.filter((ele) => ele[1] == '')
             if (emptyInput.length != 0) return res.status(400).send({ status: false, msg: "You can not pass empty query" })
@@ -314,7 +318,7 @@ const updateBooks = async function (req, res) {
             }
         }
 
-//releaseAt hume Date.now se hogya
+
         // have to pass title without quote and space
         if (newISBN) {
             let data = await bookModel.find()
@@ -403,4 +407,65 @@ module.exports.getBooks = getBooks
 module.exports.getAllBooks = getAllBooks
 module.exports.updateBooks = updateBooks
 module.exports.deleteBook = deleteBook
+
+// const getAllBooks = async function (req, res) { // have to pass id without any space
+//     try {
+
+
+//         if (isValidRequestBody(req.query)) return res.status(400).send({ status: false, msg: "You can not pass query" })
+//         if (isValidRequestBody(req.body)) return res.status(400).send({ status: false, msg: "You can not pass request body" })
+
+
+//         bookId = req.params.bookId
+//         if (!isObjectId(bookId)) return res.status(400).send({ status: false, msg: "your book id must be a object Id" })
+//         let bookData = await bookModel.findById({ _id: bookId })
+//         if (!bookData) return res.status(404).send({ status: true, msg: "book is not present" })
+
+
+//         let bookDataWithReview = await reviewModel.find({ bookId: bookId }).select({ bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })//.populate('bookId')
+//         let review = []
+
+//         // you can assign one by one 
+//         // this is static solution 
+
+//         let finalBookData = {   // no need to declare
+//             "_id": bookData._id,
+//             "title": bookData.title,
+//             "excerpt": bookData.excerpt,
+//             "userId": bookData.userId,
+//             "category": bookData.category,
+//             "subcategory": bookData.subcategory,
+//             "deleted": bookData.isDeleted,
+//             "reviews": bookData.reviews,
+//             "deletedAt": bookData.deletedAt,
+//             "releasedAt": bookData.releasedAt,
+//             "createdAt": bookData.createdAt,
+//             "updatedAt": bookData.updatedAt,
+//             ["reviewsData"]:bookDataWithReview
+//         }
+//            for (let i=0; i<bookDataWithReview.length; i++){
+//                 result = {
+//                     _id : bookDataWithReview[i]._id,
+//                     reviewedBy : bookDataWithReview[i].reviewedBy,
+//                     reviewedAt : bookDataWithReview[i].reviewedAt,
+//                     rating : bookDataWithReview[i].rating,
+//                     review : bookDataWithReview[i].review
+//            }
+//            review.push(result)
+//         }
+        
+
+//         // this is universal no need to add indivisual
+//         // let finalBookData = bookData.toObject()
+//          finalBookData.reviewsData = review
+           
+
+//         return res.status(200).send({ status: true, msg: "book data with review", data: finalBookData })
+//     }
+//     catch (err) {
+//         return res.status(500).send({ status: false, msg: err.message })
+//     }
+// }
+
+
 
